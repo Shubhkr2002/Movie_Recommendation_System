@@ -37,6 +37,47 @@ The frontend is built using **Streamlit**, while the backend API is powered by *
 
 ---
 
+---
+
+# 📸 Application Preview
+
+## 🏠 Home Page
+
+The home page allows users to search movies, browse trending titles, apply filters, and customize the recommendation grid.
+
+<p align="center">
+  <img src="Screenshots/home.png" alt="Home Page" width="100%">
+</p>
+
+---
+
+## 🎬 Movie Recommendations
+
+After selecting a movie, CineMatch recommends similar movies using **TF-IDF Vectorization** and **Cosine Similarity**.
+
+<p align="center">
+  <img src="Screenshots/recommendation.png" alt="Movie Recommendations" width="100%">
+</p>
+
+---
+
+## 🎥 Movie Details
+
+Each movie includes detailed information such as:
+
+- 🎞 Movie Poster
+- 📝 Overview
+- ⭐ Rating
+- 🎭 Genres
+- ▶ YouTube Trailer
+- 📺 Where to Watch (JustWatch)
+
+<p align="center">
+  <img src="Screenshots/input.png" alt="Movie Details" width="100%">
+</p>
+
+---
+
 ## 🚀 Live Links
 
 ### 🌐 Streamlit App
