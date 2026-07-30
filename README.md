@@ -21,12 +21,7 @@ A Machine Learning-based Movie Recommendation System built with **Python**, **Fa
 
 <br><br>
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
-![Streamlit](https://img.shields.io/badge/Streamlit-Frontend-red?logo=streamlit)
-![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green?logo=fastapi)
-![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-Machine_Learning-orange?logo=scikitlearn)
-![Pandas](https://img.shields.io/badge/Pandas-Data_Analysis-blue?logo=pandas)
-![NumPy](https://img.shields.io/badge/NumPy-Numerical_Computing-purple?logo=numpy)
+
 
 </div>
 
