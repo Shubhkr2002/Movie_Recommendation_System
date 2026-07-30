@@ -14,7 +14,7 @@ import streamlit.components.v1 as components
 USE_LOCAL_API = False  # set True while testing with `uvicorn main:app --reload`
 
 REMOTE_API_BASE = "https://movie-rec-466x.onrender.com"
-LOCAL_API_BASE = "http://127.0.0.1:8000"
+LOCAL_API_BASE = " https://movie-recommendation-system-64rq.onrender.com" or "http://127.0.0.1:8000"
 API_BASE = LOCAL_API_BASE if USE_LOCAL_API else REMOTE_API_BASE
 
 TMDB_IMG = "https://image.tmdb.org/t/p/w500"
