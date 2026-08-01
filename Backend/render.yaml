@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: movie-recommendation-backend
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:$PORT --timeout 120
+    healthCheckPath: /health
+    envVars:
+      - key: TMDB_API_KEY
+        sync: false # set manually in the Render dashboard - never commit real keys
+      - key: APP_NAME
+        value: Movie Recommendation API
+      - key: API_VERSION
+        value: "1.0"
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: ALLOWED_ORIGINS
+        value: '["*"]'
+      - key: ALLOWED_HOSTS
+        value: '["*"]'
+      - key: PYTHON_VERSION
+        value: 3.11.9
