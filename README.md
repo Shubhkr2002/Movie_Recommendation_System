@@ -7,7 +7,7 @@ A Machine Learning-based Movie Recommendation System built with **Python**, **Fa
 
 <br>
 
-<a href="https://cine-match-movie-recommendation.streamlit.app/">
+<a href="https://cine-recommendation-system.streamlit.app/">
     <img src="https://img.shields.io/badge/🚀_Live_Demo-Streamlit-red?style=for-the-badge" alt="Live Demo">
 </a>
 
