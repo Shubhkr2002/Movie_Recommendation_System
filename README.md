@@ -38,15 +38,6 @@ The frontend is built using **Streamlit**, while the backend API is powered by *
 ---
 
 
----
-
-
-
----
-
-
----
->>>>>>> 5ee6d86 (Add uvicorn to requirements)
 
 ## 🚀 Live Links
 
