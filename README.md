@@ -52,7 +52,7 @@ The frontend is built using **Streamlit**, while the backend API is powered by *
 ## 🚀 Live Links
 
 ### 🌐 Streamlit App
-https://cine-movie-recommendation-system.streamlit.app/
+https://cine-recommendation-system.streamlit.app/
 
 ### ⚡ FastAPI Backend
 https://movie-recommendation-system-64rq.onrender.com
