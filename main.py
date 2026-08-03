@@ -58,6 +58,7 @@ class TMDBMovieCard(BaseModel):
     poster_url: Optional[str] = None
     release_date: Optional[str] = None
     vote_average: Optional[float] = None
+    genre_ids: List[int] = []
 
 class TMDBMovieDetails(BaseModel):
     tmdb_id: int
@@ -131,7 +132,8 @@ async def tmdb_cards_from_results(
                 title=m.get('title') or m.get('name') or '',
                 poster_url=make_img_url(m.get('poster_path')),
                 release_date=m.get('release_date'),
-                vote_average=m.get('vote_average')
+                vote_average=m.get('vote_average'),
+                genre_ids=m.get('genre_ids') or []
             )
         )
     return out

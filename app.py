@@ -3,7 +3,6 @@ import urllib.parse
 
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
 
 # =============================
 # CONFIG
@@ -14,11 +13,21 @@ import streamlit.components.v1 as components
 USE_LOCAL_API = False  # set True while testing with `uvicorn main:app --reload`
 
 REMOTE_API_BASE = "https://movie-rec-466x.onrender.com"
-LOCAL_API_BASE = " https://movie-recommendation-system-64rq.onrender.com" or "http://127.0.0.1:8000"
+LOCAL_API_BASE = "http://127.0.0.1:8000"
 API_BASE = LOCAL_API_BASE if USE_LOCAL_API else REMOTE_API_BASE
 
 TMDB_IMG = "https://image.tmdb.org/t/p/w500"
 CATEGORIES = ["trending", "popular", "top_rated", "now_playing", "upcoming"]
+
+# Standard TMDB genre map (frontend-side filter). "Adult" is intentionally
+# excluded — that's an adult-content flag in TMDB, not a genre this app filters on.
+TMDB_GENRES = {
+    28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy",
+    80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family",
+    14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music",
+    9648: "Mystery", 10749: "Romance", 878: "Science Fiction",
+    10770: "TV Movie", 53: "Thriller", 10752: "War", 37: "Western",
+}
 
 st.set_page_config(
     page_title="CineMatch — Movie Recommender",
@@ -27,10 +36,22 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+
+def inject_html(html_str, height=0):
+    """Render raw HTML/JS into the page. Uses the new st.iframe API when
+    available, falling back to the older components.html for older
+    Streamlit versions."""
+    try:
+        st.iframe(html_str, height=height)
+    except Exception:
+        import streamlit.components.v1 as components
+        components.html(html_str, height=height)
+
+
 # =============================
 # CURSOR GLOW + CLICK RIPPLE (injected into the parent page, once)
 # =============================
-components.html(
+inject_html(
     """
     <script>
     try {
@@ -288,6 +309,13 @@ def filter_by_rating(cards, min_rating):
     return [c for c in cards if (c.get("vote_average") or 0) >= min_rating]
 
 
+def filter_by_genre(cards, selected_genre_ids):
+    if not selected_genre_ids:
+        return cards
+    selected = set(selected_genre_ids)
+    return [c for c in cards if selected & set(c.get("genre_ids") or [])]
+
+
 def poster_grid(cards, cols=6, key_prefix="grid"):
     if not cards:
         st.info("No movies to show.")
@@ -399,6 +427,7 @@ def parse_tmdb_search_to_cards(data, keyword, limit=24):
                     "poster_url": f"{TMDB_IMG}{poster_path}" if poster_path else None,
                     "release_date": m.get("release_date", ""),
                     "vote_average": m.get("vote_average"),
+                    "genre_ids": m.get("genre_ids") or [],
                 }
             )
     elif isinstance(data, list):
@@ -415,6 +444,7 @@ def parse_tmdb_search_to_cards(data, keyword, limit=24):
                     "poster_url": poster_url,
                     "release_date": m.get("release_date", ""),
                     "vote_average": m.get("vote_average"),
+                    "genre_ids": m.get("genre_ids") or [],
                 }
             )
     else:
@@ -436,6 +466,7 @@ def parse_tmdb_search_to_cards(data, keyword, limit=24):
             "poster_url": x["poster_url"],
             "release_date": x.get("release_date"),
             "vote_average": x.get("vote_average"),
+            "genre_ids": x.get("genre_ids") or [],
         }
         for x in final_list[:limit]
     ]
@@ -535,6 +566,15 @@ if st.session_state.view == "home":
         with f2:
             min_rating = st.slider("Minimum rating", 0.0, 10.0, 0.0, 0.5)
 
+        selected_genre_names = st.multiselect(
+            "Type / Genre",
+            options=list(TMDB_GENRES.values()),
+            placeholder="Action, Drama, Sci-Fi...",
+        )
+        selected_genre_ids = [
+            gid for gid, name in TMDB_GENRES.items() if name in selected_genre_names
+        ]
+
     st.divider()
 
     if typed.strip():
@@ -549,6 +589,8 @@ if st.session_state.view == "home":
             else:
                 suggestions, cards = parse_tmdb_search_to_cards(data, typed.strip(), limit=24)
                 cards = filter_by_rating(cards, min_rating)
+                if selected_genre_ids:
+                    cards = filter_by_genre(cards, selected_genre_ids)
                 cards = sort_cards(cards, sort_option)
 
                 if suggestions:
@@ -583,6 +625,15 @@ if st.session_state.view == "home":
         st.stop()
 
     home_cards = filter_by_rating(home_cards, min_rating)
+    if selected_genre_ids:
+        if any("genre_ids" in c and c["genre_ids"] for c in home_cards):
+            home_cards = filter_by_genre(home_cards, selected_genre_ids)
+        else:
+            st.info(
+                "Genre filtering needs the updated backend (adds `genre_ids` to "
+                "`/home`). Redeploy the updated `main.py` to enable it here — "
+                "showing unfiltered results for now."
+            )
     home_cards = sort_cards(home_cards, sort_option)
     poster_grid(home_cards, cols=grid_cols, key_prefix="home_feed")
 
@@ -698,9 +749,14 @@ elif st.session_state.view == "details":
         st.write(data.get("overview") or "No overview available.")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    if data.get("backdrop_url"):
+    backdrop = data.get("backdrop_url")
+    if isinstance(backdrop, str) and backdrop.startswith("http"):
         st.markdown("<div class='section-title'>🖼️ Backdrop</div>", unsafe_allow_html=True)
-        st.image(data["backdrop_url"], use_container_width=True)
+        st.markdown(
+            f"<img src='{backdrop}' style='width:100%;height:auto;border-radius:14px;"
+            f"display:block;' />",
+            unsafe_allow_html=True,
+        )
 
     remember_recent(fav_card)
 
