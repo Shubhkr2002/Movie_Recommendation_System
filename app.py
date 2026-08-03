@@ -629,10 +629,14 @@ if st.session_state.view == "home":
         if any("genre_ids" in c and c["genre_ids"] for c in home_cards):
             home_cards = filter_by_genre(home_cards, selected_genre_ids)
         else:
+            sample_keys = list(home_cards[0].keys()) if home_cards else []
             st.info(
-                "Genre filtering needs the updated backend (adds `genre_ids` to "
-                "`/home`). Redeploy the updated `main.py` to enable it here — "
-                "showing unfiltered results for now."
+                f"Genre filtering needs the updated backend (adds `genre_ids` to "
+                f"`/home`). Right now this app is hitting `{API_BASE}`, and the first "
+                f"result back has these fields: {sample_keys}. If `genre_ids` isn't "
+                f"listed there, that backend hasn't picked up the update yet — "
+                f"double-check `USE_LOCAL_API` at the top of `app.py`, redeploy "
+                f"`main.py`, then refresh this page."
             )
     home_cards = sort_cards(home_cards, sort_option)
     poster_grid(home_cards, cols=grid_cols, key_prefix="home_feed")
